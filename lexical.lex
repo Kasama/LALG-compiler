@@ -43,7 +43,7 @@ void printError(int line_number, int column_number, char* text){
 }
 
 void analyzeWord(char *word){
-	RESERVED_WORD *rWord;
+	const RESERVED_WORD *rWord;
 	rWord = in_word_set(word, strlen(word));
 	if (rWord) {
 		printToken(rWord->name, rWord->value);
@@ -53,7 +53,7 @@ void analyzeWord(char *word){
 }
 
 void analyzeSymbol(char *symbol){
-	RESERVED_WORD *rWord;
+	const RESERVED_WORD *rWord;
 	rWord = in_word_set(symbol, strlen(symbol));
 	if (rWord) {
 		printToken(rWord->name, rWord->value);

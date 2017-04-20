@@ -4,6 +4,7 @@
 		char *value;
 	} RESERVED_WORD;
 %}
+%readonly-tables
 struct reserved_word
 %%
 and, "reserved_and"

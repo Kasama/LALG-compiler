@@ -12,7 +12,7 @@ macro(gperf_generate tagName input output)
 		OUTPUT ${output}
 		COMMAND ${GPERF_EXECUTABLE} -t < ${input} > ${output}
 		DEPENDS ${input}
-		COMMENT "Using gperf to generate ${output}"
+		COMMENT "[GPERF][${tagName}] Building ${output}"
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		)
 	set(GPERF_${tagName}_OUTPUT ${output})
