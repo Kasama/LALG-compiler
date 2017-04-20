@@ -1,29 +1,23 @@
 cmake_minimum_required(VERSION 3.0)
 project(LALGCompiler)
 
-find_package(FLEX)
-find_program(GPERF_EXECUTABLE
-	gperf
-	/bin
-	)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-macro(gperf_generate tagName input output)
-	add_custom_command(
-		OUTPUT ${output}
-		COMMAND ${GPERF_EXECUTABLE} -t < ${input} > ${output}
-		DEPENDS ${input}
-		COMMENT "[GPERF][${tagName}] Building ${output}"
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		)
-	set(GPERF_${tagName}_OUTPUT ${output})
-endmacro()
+find_package(FLEX REQUIRED)
+find_package(GPERF)
 
-gperf_generate(ReservedWords reserved_words.gpref ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h)
+if(GPERF_FOUND)
+	GPERF_TARGET(ReservedWords reserved_words.gpref ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h COMPILE_FLAGS "-t")
+else()
+	MESSAGE(STATUS "Could NOT find gperf executable, using fallback pre-compiled hash map")
+	set(GPERF_ReservedWords_OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h)
+	configure_file(reserved_words_fallback.h ${GPERF_ReservedWords_OUTPUTS} COPYONLY)
+endif()
 
 FLEX_TARGET(CompilerLEXICAL lexical.lex ${CMAKE_CURRENT_BINARY_DIR}/lexical.c)
 
 add_executable(
 	LALGCompiler
 	${FLEX_CompilerLEXICAL_OUTPUTS}
-	${GPERF_ReservedWords_OUTPUT}
+	${GPERF_ReservedWords_OUTPUTS}
 	)
