@@ -5,3 +5,4 @@ LALGCompiler
 Makefile
 cmake_install.cmake
 lexical.c
+reserved_words.h
