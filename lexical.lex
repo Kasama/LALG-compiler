@@ -21,11 +21,11 @@
 	int column_number = 1;
 %}
 %%
-[ \t\r]*\{.*\}[ \t\r]*			{ column_number += strlen(yytext);}
+[ \t\r]*\{.*\}[ \t\r]*			{ column_number += strlen(yytext); }
 [ \t\r]							{ column_number++; }
 \n								{ line_number++; column_number = 0; }
-[+\-*\/\(\)\[\]\.,;:]			{ column_number++; analyzeSymbol(yytext); }
-[a-zA-Z][a-zA-Z0-9_-]*			{ column_number += strlen(yytext); analyzeWord(yytext); }
+[+\-*\/\(\)\[\]\.,;:=><]{1,2}	{ column_number += strlen(yytext); analyzeSymbol(yytext); }
+[a-zA-Z][a-zA-Z0-9_]*			{ column_number += strlen(yytext); analyzeWord(yytext); }
 [0-9]+\.[0-9]+					{ column_number += strlen(yytext); printToken(yytext, token_names[REAL]); }
 [0-9]+							{ column_number += strlen(yytext); printToken(yytext, token_names[INTEGER]); }
 .								{ printError(line_number, column_number, yytext); }
@@ -45,6 +45,8 @@ void printError(int line_number, int column_number, char* text){
 void analyzeWord(char *word){
 	const RESERVED_WORD *rWord;
 	rWord = in_word_set(word, strlen(word));
+	// if the word is recognized as a reserved word, print its name
+	// otherwise, it's an identifier
 	if (rWord) {
 		printToken(rWord->name, rWord->value);
 	} else {
@@ -54,11 +56,24 @@ void analyzeWord(char *word){
 
 void analyzeSymbol(char *symbol){
 	const RESERVED_WORD *rWord;
-	rWord = in_word_set(symbol, strlen(symbol));
+	int sym_len = strlen(symbol);
+	rWord = in_word_set(symbol, sym_len);
+	// if the symbol is recognized as a reserved symbol, print its name
 	if (rWord) {
 		printToken(rWord->name, rWord->value);
 	} else {
-		printError(line_number, column_number, symbol);
+		// otherwise, if the symbol is composed of 2 characters, test for each one.
+		if (sym_len == 2) {
+			char sym[2] = "\0\0";
+
+			sym[0] = symbol[0];
+			analyzeSymbol(sym);
+
+			yyless(1);
+		} else {
+			// if the symbol was not recognized as a reserved symbol, it was unexpected
+			printError(line_number, column_number, symbol);
+		}
 	}
 }
 
