@@ -7,8 +7,11 @@ Progress
 --------
 
 [-] Lexical Analyzer
+
 [ ] Syntatical Analyzer
+
 [ ] Semantical Analyzer
+
 [ ] Optimizer
 
 Requirements
