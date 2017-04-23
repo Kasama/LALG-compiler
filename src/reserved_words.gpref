@@ -5,6 +5,7 @@
 	} RESERVED_WORD;
 %}
 %readonly-tables
+%struct-type
 struct reserved_word
 %%
 and, "reserved_and"

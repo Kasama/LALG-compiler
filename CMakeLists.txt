@@ -7,7 +7,7 @@ find_package(FLEX REQUIRED)
 find_package(GPERF)
 
 if(GPERF_FOUND)
-	GPERF_TARGET(ReservedWords src/reserved_words.gpref ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h COMPILE_FLAGS "-t")
+	GPERF_TARGET(ReservedWords src/reserved_words.gpref ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h)
 else()
 	MESSAGE(STATUS "Could NOT find gperf executable, using fallback pre-compiled hash map")
 	set(GPERF_ReservedWords_OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h)
