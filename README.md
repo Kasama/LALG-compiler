@@ -8,7 +8,7 @@ Progress
 
 [-] Lexical Analyzer
 
-[ ] Syntatical Analyzer
+[ ] Syntactical Analyzer
 
 [ ] Semantical Analyzer
 
@@ -27,7 +27,7 @@ To build and run this project you will need:
 Building
 --------
 
-first of all clone this repository
+First of all clone this repository
 ```sh
 git clone https://github.com/Kasama/LALG-compiler.git
 cd LALG-compiler
@@ -44,8 +44,13 @@ if everything goes well, you should have and executable called `LALGCompiler` in
 Running
 -------
 
-to run the executable you can provide the code to be compiled from the `stdin` and it will print the results to `stdout`
+To run the executable you can provide the code to be compiled from the `stdin` and it will print the results to `stdout`
 ```sh
 ./LALGCompiler < test.pas > test.pas.analisys
 cat test.pas.analisys
+```
+
+Alternatively the program can read from files represented by the arguments.
+```sh
+./LALGcompiler test.pas > test.pas.analisys
 ```
