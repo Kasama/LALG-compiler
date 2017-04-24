@@ -41,6 +41,8 @@ make
 ```
 if everything goes well, you should have and executable called `LALGCompiler` inside the build directory
 
+if you get an error about missing GPERF executable, you may need to install it. Alternativelly you can use the pre-compiled hash map, which is not recommended, to do so change the `cmake ..` command above to `cmake -D USE_FALLBACK_GPERF=true ..`. This will allow cmake to use the fallback pre-compiled header.
+
 Running
 -------
 
