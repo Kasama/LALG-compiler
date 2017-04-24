@@ -9,9 +9,16 @@ find_package(GPERF)
 if(GPERF_FOUND)
 	GPERF_TARGET(ReservedWords src/reserved_words.gpref ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h)
 else()
-	MESSAGE(STATUS "Could NOT find gperf executable, using fallback pre-compiled hash map")
-	set(GPERF_ReservedWords_OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h)
-	configure_file(src/reserved_words_fallback.h ${GPERF_ReservedWords_OUTPUTS} COPYONLY)
+	if(USE_FALLBACK_GPERF)
+		MESSAGE(STATUS "Could NOT find gperf executable, using fallback pre-compiled hash map")
+		set(GPERF_ReservedWords_OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/reserved_words.h)
+		configure_file(src/reserved_words_fallback.h ${GPERF_ReservedWords_OUTPUTS} COPYONLY)
+	else()
+		MESSAGE(
+			FATAL_ERROR
+			"Could not find gperf executable. Please check if it's installed or run cmake with '-D USE_FALLBACK_GPERF=true' option to use precompiled version"
+			)
+	endif()
 endif()
 
 FLEX_TARGET(CompilerLEXICAL src/lexical.lex ${CMAKE_CURRENT_BINARY_DIR}/lexical.c)
