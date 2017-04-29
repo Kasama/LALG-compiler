@@ -3,14 +3,16 @@
 	#include <string.h>
 	#include <stdlib.h>
 	#include "reserved_words.h"
+	#define MAX_IDENTIFIER_LENGTH 127
 	void printToken(char* input, char* token);
-	void printError(int line_number, int column_number, char* text);
+	void printError(char* token);
 	void analyzeWord(char *word);
 	void analyzeSymbol(char *symbol);
 	enum Tokens {
 		IDENTIFIER = 0,
 		INTEGER,
-		REAL
+		REAL,
+		TOKENS_AMOUNT
 	};
 	char * token_names[] = {
 		"identifier",
@@ -28,7 +30,7 @@
 [a-zA-Z][a-zA-Z0-9_]*            { column_number += strlen(yytext); analyzeWord(yytext); } /* words */
 [0-9]+\.[0-9]+                   { column_number += strlen(yytext); printToken(yytext, token_names[REAL]); } /* real nums */
 [0-9]+                           { column_number += strlen(yytext); printToken(yytext, token_names[INTEGER]); } /* integers */
-.                                { printError(line_number, column_number, yytext); } /* any thing else (error) */
+.                                { printError(yytext); } /* any thing else (error) */
 %%
 
 int yywrap(){ return -1; };
@@ -40,21 +42,30 @@ void printToken(char* input, char* token){
 	return;
 }
 
-void printError(int line_number, int column_number, char* text){
+void printError(char* token){
 	// print information about line and column where the unexpected token 'text' occured
-	printf("Unrecognized token '%s' at line %d, column %d\n", text, line_number, column_number);
+	printf("Unrecognized token '%s' at line %d, column %d\n", token, line_number, column_number);
 	return;
 }
 
 void analyzeWord(char *word){
 	const RESERVED_WORD *rWord;
-	rWord = in_word_set(word, strlen(word));
+	int wordLen = strlen(word);
+	rWord = in_word_set(word, wordLen);
 	// if the word is recognized as a reserved word, print its name
 	// otherwise, it's an identifier
 	if (rWord) {
 		printToken(rWord->name, rWord->value);
 	} else {
-		printToken(word, token_names[IDENTIFIER]);
+		// check to see if the Identifier is longer than the maximum lenght
+		if (wordLen > MAX_IDENTIFIER_LENGTH) {
+			printf(
+					"Error: Identifier '%s' at line %d, column %d is too long, max is %d characters\n",
+					word, line_number, column_number, MAX_IDENTIFIER_LENGTH
+				  );
+		} else {
+			printToken(word, token_names[IDENTIFIER]);
+		}
 	}
 }
 
@@ -77,7 +88,7 @@ void analyzeSymbol(char *symbol){
 			yyless(1);
 		} else {
 			// if the symbol was not recognized as a reserved symbol, it was unexpected
-			printError(line_number, column_number, symbol);
+			printError(symbol);
 		}
 	}
 }
