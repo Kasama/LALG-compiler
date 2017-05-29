@@ -4,6 +4,7 @@ project(LALGCompiler)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 find_package(FLEX REQUIRED)
+find_package(BISON REQUIRED)
 find_package(GPERF)
 
 if(GPERF_FOUND)
@@ -21,10 +22,25 @@ else()
 	endif()
 endif()
 
-FLEX_TARGET(CompilerLEXICAL src/lexical.lex ${CMAKE_CURRENT_BINARY_DIR}/lexical.c)
+BISON_TARGET(
+	CompilerSYNTATIC
+	src/syntatic.y
+	${CMAKE_CURRENT_BINARY_DIR}/syntatic.c
+	COMPILE_FLAGS -y
+	COMPILE_FLAGS -d
+	COMPILE_FLAGS -v
+	COMPILE_FLAGS --warning=all
+	)
+
+FLEX_TARGET(
+	CompilerLEXICAL
+	src/lexical.lex
+	${CMAKE_CURRENT_BINARY_DIR}/lexical.c
+	)
 
 add_executable(
 	LALGCompiler
+	${BISON_CompilerSYNTATIC_OUTPUTS}
 	${FLEX_CompilerLEXICAL_OUTPUTS}
 	${GPERF_ReservedWords_OUTPUTS}
 	)

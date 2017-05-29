@@ -1,24 +1,12 @@
 %{
-	//#include "lexical.tab.h"
 	#include <string.h>
 	#include <stdlib.h>
 	#include "reserved_words.h"
 	#define MAX_IDENTIFIER_LENGTH 127
 	void printToken(char* input, char* token);
 	void printError(char* token);
-	void analyzeWord(char *word);
-	void analyzeSymbol(char *symbol);
-	enum Tokens {
-		IDENTIFIER = 0,
-		INTEGER,
-		REAL,
-		TOKENS_AMOUNT
-	};
-	char * token_names[] = {
-		"identifier",
-		"integer_number",
-		"real_number"
-	};
+	int analyzeWord(char *word);
+	int analyzeSymbol(char *symbol);
 	int line_number = 1;
 	int column_number = 1;
 %}
@@ -26,21 +14,14 @@
 \{.*\}                           { column_number += strlen(yytext); } /* Comments */
 [ \t\r]                          { column_number++; } /* Whitespace */
 \n                               { line_number++; column_number = 0; } /* Line break */
-[+\-*\/\(\)\[\]\.,;:=><]{1,2}    { column_number += strlen(yytext); analyzeSymbol(yytext); } /* symbols */
-[a-zA-Z][a-zA-Z0-9_]*            { column_number += strlen(yytext); analyzeWord(yytext); } /* words */
-[0-9]+\.[0-9]+                   { column_number += strlen(yytext); printToken(yytext, token_names[REAL]); } /* real nums */
-[0-9]+                           { column_number += strlen(yytext); printToken(yytext, token_names[INTEGER]); } /* integers */
+[+\-*\/\(\)\[\]\.,;:=><]{1,2}    { column_number += strlen(yytext); return analyzeSymbol(yytext); } /* symbols */
+[a-zA-Z][a-zA-Z0-9_]*            { column_number += strlen(yytext); return analyzeWord(yytext); } /* words */
+[0-9]+\.[0-9]+                   { column_number += strlen(yytext); yylval.real = atof(yytext); return REAL; } /* real nums */
+[0-9]+                           { column_number += strlen(yytext); yylval.integer = atoi(yytext); return INTEGER; } /* integers */
 .                                { printError(yytext); } /* any thing else (error) */
 %%
 
 int yywrap(){ return -1; };
-
-void printToken(char* input, char* token){
-	// Print token and its name in the format
-	// < token_matched - token_name >
-	printf("< %s - %s >\n", input, token);
-	return;
-}
 
 void printError(char* token){
 	// print information about line and column where the unexpected token 'text' occured
@@ -48,14 +29,15 @@ void printError(char* token){
 	return;
 }
 
-void analyzeWord(char *word){
+int analyzeWord(char *word){
 	const RESERVED_WORD *rWord;
 	int wordLen = strlen(word);
 	rWord = in_word_set(word, wordLen);
 	// if the word is recognized as a reserved word, print its name
 	// otherwise, it's an identifier
 	if (rWord) {
-		printToken(rWord->name, rWord->value);
+		// printToken(rWord->name, rWord->value);
+		return rWord->value;
 	} else {
 		// check to see if the Identifier is longer than the maximum lenght
 		if (wordLen > MAX_IDENTIFIER_LENGTH) {
@@ -64,18 +46,20 @@ void analyzeWord(char *word){
 					word, line_number, column_number, MAX_IDENTIFIER_LENGTH
 				  );
 		} else {
-			printToken(word, token_names[IDENTIFIER]);
+			// printToken(word, token_names[IDENTIFIER]);
+			return IDENTIFIER;
 		}
 	}
 }
 
-void analyzeSymbol(char *symbol){
+int analyzeSymbol(char *symbol){
 	const RESERVED_WORD *rWord;
 	int sym_len = strlen(symbol);
 	rWord = in_word_set(symbol, sym_len);
 	// if the symbol is recognized as a reserved symbol, print its name
 	if (rWord) {
-		printToken(rWord->name, rWord->value);
+		// printToken(rWord->name, rWord->value);
+		return rWord->value;
 	} else {
 		// otherwise, if the symbol is composed of 2 characters,
 		// test for the first and put the other one back to be read again.
@@ -93,7 +77,15 @@ void analyzeSymbol(char *symbol){
 	}
 }
 
-int main(int argc, char *argv[]){
+
+/* void printToken(char* input, char* token){
+	// Print token and its name in the format
+	// < token_matched - token_name >
+	printf("< %s - %s >\n", input, token);
+	return;
+} */
+
+/* int main(int argc, char *argv[]){
 	if (argc >= 2) {
 		// If there are arguments consider each one a filename and parse every file
 		for (int i = 1; i < argc; i++){
@@ -117,4 +109,5 @@ int main(int argc, char *argv[]){
 		fprintf(stderr, "=========== Done ===========\n");
 	}
 	return EXIT_SUCCESS;
-}
+} */
+

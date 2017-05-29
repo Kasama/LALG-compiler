@@ -1,14 +1,3 @@
-%{
-	#include "syntatic.h"
-	typedef struct reserved_word {
-		char *name;
-		int value;
-	} RESERVED_WORD;
-%}
-%readonly-tables
-%struct-type
-struct reserved_word
-%%
 and,RESERVED_AND
 and_then,RESERVED_AND_THEN
 array,RESERVED_ARRAY
