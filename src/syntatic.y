@@ -64,6 +64,8 @@
 %token RESERVED_XOR
 %token RESERVED_TYPE_INTEGER
 %token RESERVED_TYPE_REAL
+%token RESERVED_READ
+%token RESERVED_WRITE
 %token SYMBOL_EQ
 %token SYMBOL_LESS_THAN_EQ
 %token SYMBOL_GREATER_THAN_EQ
@@ -91,7 +93,7 @@
 %%
 
 program: RESERVED_PROGRAM IDENTIFIER SYMBOL_SEMICOLON body SYMBOL_PERIOD { printf("got program\n"); }
-       /* | error { printf("Thats and error\n"); } */
+       | error
        ;
 
 body: dc RESERVED_BEGIN commands RESERVED_END { printf("got body\n"); }
@@ -105,26 +107,26 @@ dc_c: %empty { printf("dc_c -> lambda\n"); }
     ;
 
 dc_v: %empty
-    | RESERVED_VAR variables SYMBOL_COLON var_types SYMBOL_SEMICOLON dc_v
+    | RESERVED_VAR variables SYMBOL_COLON var_types SYMBOL_SEMICOLON dc_v { printf("got dc_v\n"); }
     ;
 
 dc_p: %empty
-    | RESERVED_PROCEDURE IDENTIFIER parameters SYMBOL_SEMICOLON body_p dc_p
+    | RESERVED_PROCEDURE IDENTIFIER parameters SYMBOL_SEMICOLON body_p dc_p { printf("got dc_p\n"); }
     ;
 
-var_types: RESERVED_TYPE_REAL
-         | RESERVED_TYPE_INTEGER
+var_types: RESERVED_TYPE_REAL { printf("got reserved real\n"); }
+         | RESERVED_TYPE_INTEGER { printf("got reserved integer\n"); }
          ;
 
-variables: IDENTIFIER more_vars
+variables: IDENTIFIER more_vars { printf("got variables\n"); }
          ;
 
 more_vars: %empty
-         | SYMBOL_COMMA variables
+         | SYMBOL_COMMA variables { printf("got more vars\n"); }
          ;
 
 parameters: %empty
-          | SYMBOL_PARENS_OPEN par_list SYMBOL_PARENS_CLOSE
+          | SYMBOL_PARENS_OPEN par_list SYMBOL_PARENS_CLOSE { printf("got parameters\n"); }
           ;
 
 par_list: variables SYMBOL_COLON var_types more_pars
@@ -159,8 +161,9 @@ commands: %empty
         | command SYMBOL_SEMICOLON commands
         ;
 
-/* falta adicionar o `read` e `write` */
-command: RESERVED_WHILE SYMBOL_PARENS_OPEN condition SYMBOL_PARENS_CLOSE RESERVED_DO command
+command: RESERVED_READ SYMBOL_PARENS_OPEN variables SYMBOL_PARENS_CLOSE { printf("got read\n"); }
+       | RESERVED_WRITE SYMBOL_PARENS_OPEN variables SYMBOL_PARENS_CLOSE
+       | RESERVED_WHILE SYMBOL_PARENS_OPEN condition SYMBOL_PARENS_CLOSE RESERVED_DO command
        | RESERVED_FOR IDENTIFIER SYMBOL_ASSIGN expression RESERVED_TO expression RESERVED_DO command
        | RESERVED_IF condition RESERVED_THEN command p_false
        | IDENTIFIER SYMBOL_ASSIGN expression
