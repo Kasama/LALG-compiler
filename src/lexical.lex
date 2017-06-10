@@ -3,7 +3,7 @@
 	#include <stdlib.h>
 	#include "reserved_words.h"
 	#define MAX_IDENTIFIER_LENGTH 127
-	void printToken(char* input, char* token);
+	void printToken(char* input, int token);
 	void printError(char* token);
 	int analyzeWord(char *word);
 	int analyzeSymbol(char *symbol);
@@ -18,6 +18,7 @@
 [a-zA-Z][a-zA-Z0-9_]*            { column_number += strlen(yytext); return analyzeWord(yytext); } /* words */
 [0-9]+\.[0-9]+                   { column_number += strlen(yytext); yylval.real = atof(yytext); return REAL; } /* real nums */
 [0-9]+                           { column_number += strlen(yytext); yylval.integer = atoi(yytext); return INTEGER; } /* integers */
+<<EOF>>                          { return 0; }
 .                                { printError(yytext); } /* any thing else (error) */
 %%
 
@@ -36,7 +37,7 @@ int analyzeWord(char *word){
 	// if the word is recognized as a reserved word, print its name
 	// otherwise, it's an identifier
 	if (rWord) {
-		// printToken(rWord->name, rWord->value);
+		//printToken(rWord->name, rWord->value);
 		return rWord->value;
 	} else {
 		// check to see if the Identifier is longer than the maximum lenght
@@ -46,7 +47,7 @@ int analyzeWord(char *word){
 					word, line_number, column_number, MAX_IDENTIFIER_LENGTH
 				  );
 		} else {
-			// printToken(word, token_names[IDENTIFIER]);
+			//printToken(word, 1);
 			return IDENTIFIER;
 		}
 	}
@@ -58,7 +59,7 @@ int analyzeSymbol(char *symbol){
 	rWord = in_word_set(symbol, sym_len);
 	// if the symbol is recognized as a reserved symbol, print its name
 	if (rWord) {
-		// printToken(rWord->name, rWord->value);
+		//printToken(rWord->name, rWord->value);
 		return rWord->value;
 	} else {
 		// otherwise, if the symbol is composed of 2 characters,
@@ -67,9 +68,10 @@ int analyzeSymbol(char *symbol){
 			char sym[2] = "\0\0";
 
 			sym[0] = symbol[0];
-			analyzeSymbol(sym);
+			int v = analyzeSymbol(sym);
 
 			yyless(1);
+			return v;
 		} else {
 			// if the symbol was not recognized as a reserved symbol, it was unexpected
 			printError(symbol);
@@ -78,12 +80,12 @@ int analyzeSymbol(char *symbol){
 }
 
 
-/* void printToken(char* input, char* token){
+void printToken(char* input, int token){
 	// Print token and its name in the format
 	// < token_matched - token_name >
-	printf("< %s - %s >\n", input, token);
+	printf("< %s - %d >\n", input, token);
 	return;
-} */
+}
 
 /* int main(int argc, char *argv[]){
 	if (argc >= 2) {
@@ -110,4 +112,3 @@ int analyzeSymbol(char *symbol){
 	}
 	return EXIT_SUCCESS;
 } */
-
