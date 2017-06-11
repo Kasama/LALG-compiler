@@ -8,7 +8,7 @@ Progress
 
 [X] Lexical Analyzer
 
-[ ] Syntactical Analyzer
+[X] Syntactical Analyzer
 
 [ ] Semantical Analyzer
 
@@ -21,6 +21,7 @@ To build and run this project you will need:
 
 - [cmake][cmake]
 - lex (or [flex][flex])
+- [yacc][yacc] (or [bison][bison])
 - [gperf][gperf]
 - [gcc][gcc] (or another C compiler)
 
@@ -45,7 +46,7 @@ if you get an error about missing GPERF executable, you may need to [install it]
 
 Alternativelly you can use the pre-compiled hash map, which is not recommended.
 
-to do so change the `cmake ..` command above to `cmake -D USE_FALLBACK_GPERF=true ..`.
+to do so change the `cmake ..` command above to `cmake -DUSE_FALLBACK_GPERF=true ..`.
 
 This will allow cmake to use the fallback pre-compiled header.
 
@@ -58,13 +59,10 @@ To run the executable you can provide the code to be compiled from the `stdin` a
 cat test.pas.analisys
 ```
 
-Alternatively the program can read from files represented by the arguments.
-```sh
-./LALGcompiler test.pas > test.pas.analisys
-```
-
 [cmake]:https://cmake.org/download/
 [gperf]:https://www.gnu.org/software/gperf/
 [flex]:https://github.com/westes/flex
 [gcc]:https://gcc.gnu.org/
 [project-zip]:https://github.com/Kasama/LALG-compiler/archive/master.zip
+[bison]:https://www.gnu.org/software/bison/
+[yacc]:http://dinosaur.compilertools.net/yacc/
