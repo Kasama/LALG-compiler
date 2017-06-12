@@ -191,7 +191,7 @@ p_false: %empty %prec NO_ELSE
 
 commands: %empty
         | command SYMBOL_SEMICOLON commands //{printf("got commands\n");}
-        | error SYMBOL_SEMICOLON {printf("Misformed Command\n");} commands {yyerrok; } //Se falhar um commando, PANIC!
+        | error SYMBOL_SEMICOLON {printf("Malformed Command\n");} commands {yyerrok; } //Se falhar um commando, PANIC!
         ;
 
 command: RESERVED_READ SYMBOL_PARENS_OPEN variables SYMBOL_PARENS_CLOSE //{printf("got read\n"); }
@@ -273,7 +273,7 @@ void yyerror(char *s){
 
 int main(int argc, char *argv[]){
     yyparse();
-    if( errorcount == 0 ) printf("Sucessful compiled!\n");
+    if( errorcount == 0 ) printf("Successfully compiled!\n");
     else printf("Failed! Got %d errors!\n", errorcount);
     return 0;
 }
